@@ -1,3 +1,8 @@
+# This script searches for a specified file within a given directory,
+# locates a specified variable within that file,
+# and then updates the value of the variable by decreasing it by 15%.
+# Finally, it writes the updated content back to the original file and prints a confirmation message.
+
 # Variables
 $file_name = "your_filename.txt"  # Name of the file to find (replace with your file name)
 $variable_name = "your_variable"  # Name of the variable to edit (replace with your variable name)
