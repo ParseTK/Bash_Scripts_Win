@@ -1,0 +1,5 @@
+1.) If you wish to change the name of the powershell script be sure to edit the bat file and change the "edit_variable.ps1" 
+change it to match the name of the powershell script. Example: powershell -ExecutionPolicy Bypass -File i_changed_the_name.ps1
+
+2.) To run the script simply double click the batch file or enter the bat file name including extension in the command prompt.
+Example: edit_variable.bat
