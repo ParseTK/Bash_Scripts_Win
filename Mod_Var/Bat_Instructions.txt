@@ -2,8 +2,6 @@
 change it to match the name of the powershell script. Example: powershell -ExecutionPolicy Bypass -File i_changed_the_name.ps1
 
 2.) To run the script simply double click the batch file or enter the bat file name including extension in the command prompt.
-Example: edit_variable.bat
 
-3.) Just be mindful on the third line where it says $search_directory, 
-the named directory will modify ALL the directories with that name that also has the name of the specific file you put to modify. 
-Replace "vehicles" with the path you wish to edit the specified files in.
+
+
