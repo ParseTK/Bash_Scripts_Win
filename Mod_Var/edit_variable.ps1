@@ -1,40 +1,82 @@
-# This script searches for a specified file within a given directory,
-# locates a specified variable within that file,
-# and then updates the value of the variable by decreasing it by 15%.
-# Finally, it writes the updated content back to the original file and prints a confirmation message.
+# Define the root directory path where the search will begin
+$rootPath = "root path"
 
-# Variables
-$file_name = "your_filename.txt"  # Name of the file to find (replace with your file name)
-$variable_name = "your_variable"  # Name of the variable to edit (replace with your variable name)
-$search_directory = "C:\path\to\your\vehicles"  # Full path to the directory to search in (replace with your search directory)
+# Define the name of the variable we're looking to update in the XML files
+$variableName = "varname"
 
-# Find the file
-$file_path = Get-ChildItem -Path $search_directory -Filter $file_name -Recurse -File | Select-Object -First 1
-# Searches recursively in the specified directory for the file with the given name and selects the first matching file
+# Function to update the value of a specific variable (e.g., fInitialDriveForce) in handling.meta files
+function Update-DriveForce {
+    param (
+        [string]$filePath,  # Path to the XML file (handling.meta) to be updated
+        [string]$varName    # Name of the variable we want to modify
+    )
 
-if (-not $file_path) {
-    Write-Host "File not found in $search_directory!"
-    exit 1
-    # Checks if the file was found; if not, prints a message and exits the script with an error code
+    # Display the file being updated
+    Write-Host "Updating file: $filePath"
+
+    try {
+        # Load the handling.meta file as XML
+        [xml]$xmlDoc = Get-Content -Path $filePath
+
+        # Find all XML nodes within the file that have a "value" attribute
+        $nodes = $xmlDoc.SelectNodes("//CHandlingDataMgr/HandlingData/Item/*[@value]")
+
+        # Initialize a flag to check if the variable is found
+        $foundVariable = $false
+
+        # Loop through all nodes to find the specific variable
+        foreach ($node in $nodes) {
+            # Check if the current node's name matches the variable name
+            if ($node.Name -eq $varName) {
+                # Retrieve the current value of the variable as a double
+                $currentValue = [double]$node.value
+
+                # Decrease the variable's value by 0.05
+                $newValue = $currentValue - 0.05
+
+                # Update the XML node's value with the new value formatted to five decimal places
+                $node.value = $newValue.ToString("0.00000")
+
+                # Display the updated value in the console
+                Write-Host "${varName}: $currentValue -> $newValue"
+
+                # Set the flag to true since the variable was found and updated
+                $foundVariable = $true
+            }
+        }
+
+        # Save the updated XML file if the variable was found
+        if ($foundVariable) {
+            $xmlDoc.Save($filePath)
+        } else {
+            # Print a message if the variable was not found in the current file
+            Write-Host "Variable ${varName} not found in file: $filePath"
+        }
+    } catch {
+        # Catch and display errors that occur while processing the file
+        Write-Host "Error processing file: $filePath - $($_.Exception.Message)"
+    }
 }
 
-# Edit the file
-(Get-Content $file_path.FullName) | ForEach-Object {
-    if ($_ -match "$variable_name\s*=\s*(\d+(\.\d+)?)") {
-        $value = [double]$matches[1]
-        # Captures the value of the variable using regular expressions
+# Function to recursively traverse directories to locate handling.meta files
+function Traverse-Directories {
+    param (
+        [string]$folderPath,  # Root directory to start searching
+        [string]$varName      # Name of the variable to be updated
+    )
 
-        $new_value = $value - ($value * 0.15)
-        # Calculates the new value by subtracting 15% of the original value
+    # Display the directory currently being traversed
+    Write-Host "Traversing directory: $folderPath"
 
-        $_ = $_ -replace "$variable_name\s*=\s*\d+(\.\d+)?", "$variable_name=$new_value"
-        # Replaces the old variable assignment with the new value
+    # Find all handling.meta files in the directory and its subdirectories
+    $handlingFiles = Get-ChildItem -Path $folderPath -Recurse -Filter "handling.meta"
+
+    # Process each handling.meta file found
+    foreach ($handlingFile in $handlingFiles) {
+        # Call the Update-DriveForce function for each file
+        Update-DriveForce -filePath $handlingFile.FullName -varName $varName
     }
-    $_
-    # Outputs the modified or unchanged line
-} | Set-Content $file_path.FullName
-# Writes the updated content back to the original file
+}
 
-Write-Host "Variable $variable_name in $file_name has been updated."
-# Prints a message indicating that the variable in the specified file has been updated
-
+# Start the directory traversal process from the root path provided
+Traverse-Directories -folderPath $rootPath -varName $variableName
