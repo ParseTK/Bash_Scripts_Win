@@ -1,2 +1,2 @@
 @echo off
-powershell -ExecutionPolicy Bypass -File edit_variable.ps1
+powershell -ExecutionPolicy Bypass -File name_of_file_being_ran.ps1
