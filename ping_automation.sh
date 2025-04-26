@@ -32,7 +32,7 @@ Ping_Hosts()
 for HOST in "${HOSTS[@]}"
 do
     Ping_Hosts "$HOST"
-    echo "*************************"
+    echo "◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉◉"
 done
 
 
