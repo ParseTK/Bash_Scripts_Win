@@ -28,10 +28,11 @@ Ping_Hosts()
     fi
 }
 
-    for HOST in "${HOSTS[@]}"
-    do
-        Ping_Hosts "$HOST"
-        echo "*************************"
-    done
+# Loop through HOSTS calling the Ping_Host Function
+for HOST in "${HOSTS[@]}"
+do
+    Ping_Hosts "$HOST"
+    echo "*************************"
+done
 
 
